@@ -1,2 +1,2 @@
 # django-giftlist
-Wedding gift store
+Wedding gift store in django

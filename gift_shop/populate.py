@@ -18,9 +18,10 @@ def populate():
             in_stock_quantity = int(product["in_stock_quantity"])
             Product.objects.get_or_create(name=name, brand=brand, price=price, in_stock_quantity=in_stock_quantity)
 
+
 def add_dummy_couple_and_gift_list():
     login_name = "Couple"
-    login_password = "UnsecurePassword"
+    login_password = "InsecurePassword"
     groom_name = "Andy Groom"
     bride_name = "Beatrix Kiddo"
     email = "shared_email@ymail.com"

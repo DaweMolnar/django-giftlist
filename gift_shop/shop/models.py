@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Product(models.Model):
     name = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
@@ -9,6 +8,7 @@ class Product(models.Model):
 
     def __str__(self):
         return str(self.name)
+
 
 class Couple(models.Model):
     login_name = models.CharField(max_length=50)
@@ -33,10 +33,19 @@ class Gift_list(models.Model):
 
 class Gift_item(models.Model):
     added = models.DateTimeField(auto_now_add=True, editable=False)
-    bought = models.BooleanField(default=False)
+    bought_quantity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=1)
     note = models.CharField(max_length=500)
     gift_list = models.ForeignKey(Gift_list, related_name="gifts", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name="gifts", on_delete=models.CASCADE)
+
+    def increase_quantity(self):
+        self.quantity += 1
+        self.save()
+
+    def decrease_quantity(self):
+        self.quantity -= 1
+        self.save()
 
     def __str__(self):
         return str(self.product.name)

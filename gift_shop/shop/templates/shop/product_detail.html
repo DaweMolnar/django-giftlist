@@ -10,7 +10,7 @@
     <h3>Chosen as gift:</h3>
 
       {% for gift in product_details.gifts.all %}
-        <p>Chosen by {{gift.bride}} and {{gift.groom}}.</p>
+        <p>Added to gift list:  {{gift.gift_list.name}}</p>
       {% endfor %}
 
   </div>

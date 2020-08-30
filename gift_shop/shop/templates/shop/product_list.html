@@ -2,7 +2,7 @@
 {% block body_block %}
   <div class="jumbotron">
 
-    <h1>Products to chose from</h1>
+    <h1>Products to choose from</h1>
     <table class="table">
     <thead class="thead-dark">
       <tr>
@@ -22,7 +22,12 @@
         <td>{{product.brand}}</td>
         <td>{{product.price}}</td>
         <td>{{product.in_stock_quantity}}</td>
-        <td><a class="btn btn-primary" href="{{product.id}}" role="button">Product details</a></td>
+        <td>
+          <form action="{% url 'shop:list' %}" method="GET">
+            <input type="hidden" name="product_id" value="{{product.id}}">
+            <input class="btn btn-primary" type="submit" value="Add to gift list">
+          </form>
+        </td>
       <tr>
     {% endfor %}
     </tbody>

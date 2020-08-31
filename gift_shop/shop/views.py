@@ -1,14 +1,10 @@
 from django.core.exceptions import ValidationError
-from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView
 from . import models
 from django.contrib import messages
-# Create your views here.
 
 
 class IndexView(TemplateView):
-    # Just set this Class Object Attribute to the template page.
-    # template_name = 'app_name/site.html'
     template_name = 'shop/index.html'
 
 
@@ -70,3 +66,9 @@ class GiftListView(ListView):
             messages.info(self.request, "Successfully bought gift")
         except ValidationError as err:
             messages.error(self.request, "Error when buying gift: {}".format(err))
+
+
+class ReportView(ListView):
+    model = models.Gift_list
+    context_object_name = 'reports'
+    template_name = 'shop/report.html'

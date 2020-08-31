@@ -1,11 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase, RequestFactory
 from .models import Product, Couple, Gift_list, Gift_item
-from .views import GiftListView
+from .views import GiftListView, ProductListView
 from django.contrib.messages.storage.fallback import FallbackStorage
 
 
 def set_up_gifts():
+    Product.objects.create(name="NotSelectedProduct", brand="TestBrand", price="100.00GBP", in_stock_quantity=1)
     product = Product.objects.create(name="TestProduct", brand="TestBrand", price="100.00GBP", in_stock_quantity=1)
     product2 = Product.objects.create(name="TestProduct2", brand="TestBrand", price="1.00GBP", in_stock_quantity=100)
     couple = Couple.objects.create(
@@ -126,3 +127,43 @@ class GiftViewTest(TestCase):
         view.get_queryset()
         gift = Gift_item.objects.get(note="more_test")
         self.assertEqual(gift.bought_quantity, 1)
+
+
+class ProductViewTest(TestCase):
+
+    def setUp(self):
+        set_up_gifts()
+
+    @staticmethod
+    def mocked_message_request(request):
+        """
+        default messages doesn't work with RequestFactory
+        :param request:
+        :return:
+        """
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        return request
+
+    def set_up_view(self):
+        request = RequestFactory().get('/')
+        request = self.mocked_message_request(request)
+        if not request.GET._mutable:
+            request.GET._mutable = True
+        view = ProductListView()
+        view.setup(request)
+        return view
+
+    def test_product_add(self):
+        test_product = Product.objects.get(name="NotSelectedProduct")
+        view = self.set_up_view()
+        self.assertEqual(len(test_product.gifts.all()), 0)
+        view.request.GET['product_id'] = str(test_product.id)
+        view.get_queryset()
+        self.assertEqual(len(test_product.gifts.all()), 1)
+        gift = test_product.gifts.all().first()
+        self.assertEqual(gift.quantity, 1)
+        view.get_queryset()
+        gift = test_product.gifts.all().first()
+        self.assertEqual(gift.quantity, 2)

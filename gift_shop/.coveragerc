@@ -1,0 +1,6 @@
+[run]
+ omit =
+  */templatetags/*
+  */migrations/*
+  manage.py
+  populate.py

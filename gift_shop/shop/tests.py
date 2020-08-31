@@ -83,12 +83,18 @@ class GiftViewTest(TestCase):
         setattr(request, '_messages', messages)
         return request
 
-    def test_gift_buy(self):
-        gift = Gift_item.objects.get(note="more_test")
+    def set_up_view(self):
         request = RequestFactory().get('/')
         request = self.mocked_message_request(request)
+        if not request.GET._mutable:
+            request.GET._mutable = True
         view = GiftListView()
         view.setup(request)
+        return view
+
+    def test_gift_buy(self):
+        gift = Gift_item.objects.get(note="more_test")
+        view = self.set_up_view()
         self.assertEqual(gift.bought_quantity, 0)
         view.buy_gift(gift.id)
         gift = Gift_item.objects.get(note="more_test")
@@ -96,10 +102,7 @@ class GiftViewTest(TestCase):
 
     def test_gift_remove(self):
         gift = Gift_item.objects.get(note="more_test")
-        request = RequestFactory().get('/')
-        request = self.mocked_message_request(request)
-        view = GiftListView()
-        view.setup(request)
+        view = self.set_up_view()
         self.assertEqual(gift.quantity, 1)
         view.delete_gift(gift.id)
         self.assertRaises(Gift_item.DoesNotExist, Gift_item.objects.get, note="more_test")
@@ -111,25 +114,15 @@ class GiftViewTest(TestCase):
 
     def test_query_remove(self):
         gift = Gift_item.objects.get(note="more_test")
-        request = RequestFactory().get('/')
-        request = self.mocked_message_request(request)
-        if not request.GET._mutable:
-            request.GET._mutable = True
-        request.GET['delete_gift_id'] = str(gift.id)
-        view = GiftListView()
-        view.setup(request)
+        view = self.set_up_view()
+        view.request.GET['delete_gift_id'] = str(gift.id)
         view.get_queryset()
         self.assertRaises(Gift_item.DoesNotExist, Gift_item.objects.get, note="more_test")
 
     def test_query_buy(self):
         gift = Gift_item.objects.get(note="more_test")
-        request = RequestFactory().get('/')
-        request = self.mocked_message_request(request)
-        if not request.GET._mutable:
-            request.GET._mutable = True
-        request.GET['buy_gift_id'] = str(gift.id)
-        view = GiftListView()
-        view.setup(request)
+        view = self.set_up_view()
+        view.request.GET['buy_gift_id'] = str(gift.id)
         view.get_queryset()
         gift = Gift_item.objects.get(note="more_test")
         self.assertEqual(gift.bought_quantity, 1)

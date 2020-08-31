@@ -59,6 +59,8 @@ class Gift_item(models.Model):
         self.save()
 
     def decrease_quantity(self):
+        if self.quantity == 1:
+            raise ValidationError("Cannot modify gift quantity below 1")
         self.quantity -= 1
         self.save()
 

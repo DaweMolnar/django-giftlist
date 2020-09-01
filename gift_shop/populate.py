@@ -7,6 +7,7 @@ django.setup()
 import json
 from shop.models import Product, Couple, Gift_list
 
+from django.contrib.auth.models import User
 
 def populate():
     with open("products.json") as json_file:
@@ -20,22 +21,14 @@ def populate():
 
 
 def add_dummy_couple_and_gift_list():
-    login_name = "Couple"
-    login_password = "InsecurePassword"
-    groom_name = "Andy Groom"
-    bride_name = "Beatrix Kiddo"
-    email = "shared_email@ymail.com"
-    phone_number = "+44 1632 960917"
-    Couple.objects.get_or_create(
-        login_name=login_name
-        , login_password=login_password
-        , groom_name=groom_name
-        , bride_name=bride_name
-        , email=email
-        , phone_number=phone_number
-    )
+    user = User.objects.create_user('testCouple', 'shared_email@ymail.com', 'password')
+    user.couple.groom_name = "Andy Groom"
+    user.couple.bride_name = "Beatrix Kiddo"
+    user.couple.phone_number = "+44 1632 960917"
+    user.save()
+
     name = "Dummy Gift List"
-    Gift_list.objects.get_or_create(name=name, couple=Couple.objects.all().first())
+    Gift_list.objects.get_or_create(name=name, couple=user.couple)
 
 
 populate()

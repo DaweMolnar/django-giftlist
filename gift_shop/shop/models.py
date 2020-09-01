@@ -1,5 +1,8 @@
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Product(models.Model):
@@ -19,15 +22,24 @@ class Product(models.Model):
 
 
 class Couple(models.Model):
-    login_name = models.CharField(max_length=50)
-    login_password = models.CharField(max_length=256)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     groom_name = models.CharField(max_length=100, default="Andy Groom")
     bride_name = models.CharField(max_length=100, default="Beatrix Kiddo")
-    email = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=30)
 
     def __str__(self):
-        return str(self.login_name)
+        return str(self.email)
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Couple.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.couple.save()
 
 
 class Gift_list(models.Model):

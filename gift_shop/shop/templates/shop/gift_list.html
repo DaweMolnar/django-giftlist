@@ -31,11 +31,12 @@
           <td>{{gift.quantity}}</td>
           <td>{{gift.bought_quantity}}</td>
           <td>
+           {% if user.is_authenticated %}
            <form action="{% url 'shop:gifts' %}" method="GET">
              <input type="hidden" name="delete_gift_id" value="{{gift.id}}">
              <input class="btn btn-danger" type="submit" value="Remove from gift list">
            </form>
-            <br>
+           {% endif %}
           </td>
           <td>
            <form action="{% url 'shop:gifts' %}" method="GET">

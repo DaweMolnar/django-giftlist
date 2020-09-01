@@ -1,4 +1,10 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView
 from . import models
 from django.contrib import messages
@@ -72,3 +78,30 @@ class ReportView(ListView):
     model = models.Gift_list
     context_object_name = 'reports'
     template_name = 'shop/report.html'
+
+
+class LoginView(View):
+    template_name = 'shop/login.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+            else:
+                messages.error(self.request, "Inactive user.") #TODO log
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            messages.error(self.request, "Invalid login details supplied")
+        return HttpResponseRedirect(reverse('shop:login'))
+
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('index'))

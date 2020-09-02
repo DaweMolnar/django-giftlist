@@ -21,16 +21,15 @@ blocks:
       jobs:
         - name: Unit tests
           commands:
+            - cd gift_shop/
             - python manage.py makemigrations
             - python manage.py migrate
             - python manage.py test
         - name: Checklist
           commands:
+            - cd ../gift_shop/
             - python manage.py check --deploy
         - name: Style check
           commands:
             - pip install flake8
             - flake8 gift_shop/ --max-line-length=127
-      prologue:
-        commands:
-          - cd gift_shop

@@ -28,7 +28,7 @@ blocks:
             - python manage.py test
         - name: Checklist
           commands:
-            - cd ../gift_shop/
+            - cd gift_shop/
             - python manage.py check --deploy
         - name: Style check
           commands:

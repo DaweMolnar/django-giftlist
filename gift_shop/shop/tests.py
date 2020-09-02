@@ -132,7 +132,6 @@ class ProductViewTest(TestCase):
     def setUp(self):
         set_up_gifts()
 
-
     def set_up_view(self):
         request = RequestFactory().get('/')
         request = mocked_message_request(request)

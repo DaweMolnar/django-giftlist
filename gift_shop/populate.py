@@ -5,9 +5,10 @@ import django
 django.setup()
 
 import json
-from shop.models import Product, Couple, Gift_list
+from shop.models import Product, Gift_list
 
 from django.contrib.auth.models import User
+
 
 def populate():
     with open("products.json") as json_file:

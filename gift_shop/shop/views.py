@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
@@ -20,13 +20,13 @@ class ProductListView(ListView):
     def get_queryset(self):
         if self.request.method == 'GET':
             product_id = self.request.GET.get('product_id', None)
-            if product_id != None:
+            if product_id is not None:
                 self.add_product(product_id)
         return models.Product.objects.all()
 
     def add_product(self, product_id):
         product = models.Product.objects.get(pk=product_id)
-        gift_list = models.Gift_list.objects.all().first() #TODO handle multiple lists
+        gift_list = models.Gift_list.objects.all().first()  # TODO handle multiple lists
         gift, created = models.Gift_item.objects.get_or_create(gift_list=gift_list, product=product)
         if not created:
             gift.increase_quantity()
@@ -48,9 +48,9 @@ class GiftListView(ListView):
         if self.request.method == 'GET':
             delete_gift_id = self.request.GET.get('delete_gift_id', None)
             buy_gift_id = self.request.GET.get('buy_gift_id', None)
-            if delete_gift_id != None: #TODO handle delete if one gift was already bougth
+            if delete_gift_id is not None:  # TODO handle delete if one gift was already bougth
                 self.delete_gift(delete_gift_id)
-            if buy_gift_id != None:
+            if buy_gift_id is not None:
                 self.buy_gift(buy_gift_id)
         return models.Gift_list.objects.all()
 
@@ -63,7 +63,7 @@ class GiftListView(ListView):
                 gift.decrease_quantity()
             messages.info(self.request, "Successfully removed a gift")
         except ValidationError as err:
-            messages.error("Error when deleting gift: ".format(err))
+            messages.error("Error when deleting gift: {}".format(err))
 
     def buy_gift(self, gift_id):
         try:

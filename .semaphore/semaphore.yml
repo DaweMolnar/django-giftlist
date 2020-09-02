@@ -33,7 +33,7 @@ blocks:
         - name: Style check
           commands:
             - pip install flake8
-            - flake8 gift_shop/ --max-line-length=127
+            - flake8 gift_shop/ --max-line-length=127 --exclude=gift_shop/shop/migrations,gift_shop/populate.py
       prologue:
         commands:
           - sem-version python 3.7

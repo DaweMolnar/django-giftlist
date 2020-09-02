@@ -8,12 +8,11 @@ blocks:
   - name: Build
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Build
           commands:
-            - cd gift_shop
             - sem-version python 3.7
             - checkout
             - mkdir .pip_cache
             - cache restore
-            - pip install --cache-dir .pip_cache -r requirements.txt
+            - pip install --cache-dir .pip_cache -r gift_shop/requirements.txt
             - cache store

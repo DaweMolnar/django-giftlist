@@ -10,6 +10,7 @@ blocks:
       jobs:
         - name: 'Job #1'
           commands:
+            - cd gift_shop
             - sem-version python 3.7
             - checkout
             - mkdir .pip_cache

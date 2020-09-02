@@ -94,7 +94,7 @@ class LoginView(View):
             if user.is_active:
                 login(request, user)
             else:
-                messages.error(self.request, "Inactive user.") #TODO log
+                messages.error(self.request, "Inactive user.")
             return HttpResponseRedirect(reverse('index'))
         else:
             messages.error(self.request, "Invalid login details supplied")

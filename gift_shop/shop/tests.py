@@ -1,23 +1,33 @@
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ValidationError
 from django.test import TestCase, RequestFactory
-from .models import Product, Couple, Gift_list, Gift_item
-from .views import GiftListView, ProductListView
+from .models import Product, Gift_list, Gift_item
+from .views import GiftListView, ProductListView, LoginView
 from django.contrib.messages.storage.fallback import FallbackStorage
+
+
+def mocked_message_request(request):
+    """
+    default messages doesn't work with RequestFactory
+    :param request:
+    :return:
+    """
+    setattr(request, 'session', 'session')
+    messages = FallbackStorage(request)
+    setattr(request, '_messages', messages)
+    return request
 
 
 def set_up_gifts():
     Product.objects.create(name="NotSelectedProduct", brand="TestBrand", price="100.00GBP", in_stock_quantity=1)
     product = Product.objects.create(name="TestProduct", brand="TestBrand", price="100.00GBP", in_stock_quantity=1)
     product2 = Product.objects.create(name="TestProduct2", brand="TestBrand", price="1.00GBP", in_stock_quantity=100)
-    couple = Couple.objects.create(
-        login_name="Couple"
-        , login_password="Password"
-        , groom_name="Test Groom"
-        , bride_name="Test Bride"
-        , email="test@test.com"
-        , phone_number="+44 1632 960917"
-    )
-    gift_list = Gift_list.objects.create(name="Test list", couple=couple)
+    user = User.objects.create_user('Couple', 'test@test.com', 'password')
+    user.couple.groom_name = "Test Groom"
+    user.couple.bride_name = "Test Bride"
+    user.couple.phone_number = "+44 1632 960917"
+    user.save()
+    gift_list = Gift_list.objects.create(name="Test list", couple=user.couple)
     Gift_item.objects.create(quantity=2, gift_list=gift_list, product=product, note="oos_test")
     Gift_item.objects.create(quantity=1, gift_list=gift_list, product=product2, note="more_test")
     Gift_item.objects.create(quantity=1, gift_list=gift_list, product=product2, note="quantity_test")
@@ -72,21 +82,9 @@ class GiftViewTest(TestCase):
     def setUp(self):
         set_up_gifts()
 
-    @staticmethod
-    def mocked_message_request(request):
-        """
-        default messages doesn't work with RequestFactory
-        :param request:
-        :return:
-        """
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        return request
-
     def set_up_view(self):
         request = RequestFactory().get('/')
-        request = self.mocked_message_request(request)
+        request = mocked_message_request(request)
         if not request.GET._mutable:
             request.GET._mutable = True
         view = GiftListView()
@@ -134,21 +132,10 @@ class ProductViewTest(TestCase):
     def setUp(self):
         set_up_gifts()
 
-    @staticmethod
-    def mocked_message_request(request):
-        """
-        default messages doesn't work with RequestFactory
-        :param request:
-        :return:
-        """
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        return request
 
     def set_up_view(self):
         request = RequestFactory().get('/')
-        request = self.mocked_message_request(request)
+        request = mocked_message_request(request)
         if not request.GET._mutable:
             request.GET._mutable = True
         view = ProductListView()
@@ -167,3 +154,36 @@ class ProductViewTest(TestCase):
         view.get_queryset()
         gift = test_product.gifts.all().first()
         self.assertEqual(gift.quantity, 2)
+
+
+class LoginViewTest(TestCase):
+    def setUp(self):
+        set_up_gifts()
+
+    def set_up_view(self):
+        request = RequestFactory().get('/')
+        request = mocked_message_request(request)
+        request.user = AnonymousUser()
+        request.session = self.client.session
+        request.session.create()
+        if not request.POST._mutable:
+            request.POST._mutable = True
+        view = LoginView()
+        view.setup(request)
+        return view
+
+    def test_login_correct(self):
+        view = self.set_up_view()
+        view.request.POST['username'] = "Couple"
+        view.request.POST['password'] = "password"
+        self.assertFalse(view.request.user.is_authenticated)
+        view.post(view.request)
+        self.assertTrue(view.request.user.is_authenticated)
+
+    def test_login_incorrect(self):
+        view = self.set_up_view()
+        view.request.POST['username'] = "Couple"
+        view.request.POST['password'] = "Wrongpassword"
+        self.assertFalse(view.request.user.is_authenticated)
+        view.post(view.request)
+        self.assertFalse(view.request.user.is_authenticated)

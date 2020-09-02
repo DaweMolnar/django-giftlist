@@ -21,7 +21,6 @@ blocks:
       jobs:
         - name: Unit tests
           commands:
-            - pwd
             - cd gift_shop/
             - python manage.py makemigrations
             - python manage.py migrate
@@ -34,6 +33,13 @@ blocks:
           commands:
             - pip install flake8
             - 'flake8 gift_shop/ --max-line-length=127 --exclude=gift_shop/shop/migrations,gift_shop/populate.py'
+        - name: Coverage
+          commands:
+            - cd gift_shop/
+            - python manage.py makemigrations
+            - python manage.py migrate
+            - coverage run --source='.' manage.py test shop
+            - coverage report --fail-under=90
       prologue:
         commands:
           - sem-version python 3.7

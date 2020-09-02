@@ -33,10 +33,15 @@ blocks:
         - name: Style check
           commands:
             - pip install flake8
-            - flake8 gift_shop/ --max-line-length=127 --exclude=gift_shop/shop/migrations,gift_shop/populate.py
+            - 'flake8 gift_shop/ --max-line-length=127 --exclude=gift_shop/shop/migrations,gift_shop/populate.py'
       prologue:
         commands:
           - sem-version python 3.7
           - checkout
           - cache restore
           - pip install --cache-dir .pip_cache -r requirements.txt
+promotions:
+  - name: Dockerize
+    pipeline_file: pipeline_2.yml
+    auto_promote:
+      when: branch = 'master' AND result = 'passed'

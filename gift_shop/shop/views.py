@@ -25,8 +25,12 @@ class ProductListView(ListView):
         return models.Product.objects.all()
 
     def add_product(self, product_id):
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            messages.error(self.request, "Cannot add product to gift list without authentication")
+            return
         product = models.Product.objects.get(pk=product_id)
-        gift_list = models.Gift_list.objects.all().first()  # TODO handle multiple lists
+        gift_list = user.couple.gift_lists.all().first()
         gift, created = models.Gift_item.objects.get_or_create(gift_list=gift_list, product=product)
         if not created:
             gift.increase_quantity()

@@ -10,5 +10,4 @@ urlpatterns = [
     path('report/', login_required(views.ReportView.as_view()), name='report'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.user_logout, name='logout'),
-    path('<int:pk>/', views.ProductDetailView.as_view(), name='detail'),
 ]

@@ -37,12 +37,6 @@ class ProductListView(ListView):
         messages.info(self.request, "Successfully added gift to gift list")
 
 
-class ProductDetailView(DetailView):
-    context_object_name = 'product_details'
-    model = models.Product
-    template_name = 'shop/product_detail.html'
-
-
 class GiftListView(ListView):
     context_object_name = 'gift_lists'
     template_name = 'shop/gift_list.html'
@@ -52,7 +46,7 @@ class GiftListView(ListView):
         if self.request.method == 'GET':
             delete_gift_id = self.request.GET.get('delete_gift_id', None)
             buy_gift_id = self.request.GET.get('buy_gift_id', None)
-            if delete_gift_id is not None:  # TODO handle delete if one gift was already bougth
+            if delete_gift_id is not None:  # TODO handle delete if one gift was already bought
                 self.delete_gift(delete_gift_id)
             if buy_gift_id is not None:
                 self.buy_gift(buy_gift_id)
@@ -97,6 +91,7 @@ class LoginView(View):
         if user:
             if user.is_active:
                 login(request, user)
+                messages.info(self.request, "Successfully logged in")
             else:
                 messages.error(self.request, "Inactive user.")
             return HttpResponseRedirect(reverse('index'))

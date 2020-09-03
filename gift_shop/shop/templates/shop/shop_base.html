@@ -37,14 +37,14 @@
       {% if messages %}
         <ul class="messages">
         {% for message in messages %}
-        {% if message.tags == "error" %}
-          <div class="alert alert-danger" role="alert">
-        {% else %}
-          <div class="alert alert-success" role="alert">
-        {% endif %}
+          {% if message.tags == "error" %}
+            <div class="alert alert-danger" role="alert">
+          {% else %}
+            <div class="alert alert-success" role="alert">
+          {% endif %}
             {{ message }}
-          </div>
-      {% endfor %}
+            </div>
+        {% endfor %}
         </ul>
       {% endif %}
       {% block body_block %}

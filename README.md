@@ -24,7 +24,7 @@ After starting the docker image, you can reach the site on port 8020 with http:/
 
 You can buy gifts from the gift list without logging in, but for other features, you have to authenticate first.
 
-Currently there is no multiple user support, the username and password are the following (can be also found in the populate.py script):
+Currently, there is no multiple user support, the username and password are the following (can also be found in the populate.py script):
 | Username     | Password   |
 | :----------- | :--------: |
 | testCouple   | password   |

@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import ValidationError
 from django.test import TestCase, RequestFactory
@@ -9,8 +10,6 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 def mocked_message_request(request):
     """
     default messages doesn't work with RequestFactory
-    :param request:
-    :return:
     """
     setattr(request, 'session', 'session')
     messages = FallbackStorage(request)
@@ -135,6 +134,7 @@ class ProductViewTest(TestCase):
     def set_up_view(self):
         request = RequestFactory().get('/')
         request = mocked_message_request(request)
+        request.user = AnonymousUser()
         if not request.GET._mutable:
             request.GET._mutable = True
         view = ProductListView()
@@ -146,6 +146,9 @@ class ProductViewTest(TestCase):
         view = self.set_up_view()
         self.assertEqual(len(test_product.gifts.all()), 0)
         view.request.GET['product_id'] = str(test_product.id)
+        view.get_queryset()
+        self.assertEqual(len(test_product.gifts.all()), 0)
+        view.request.user = authenticate(username="Couple", password="password")
         view.get_queryset()
         self.assertEqual(len(test_product.gifts.all()), 1)
         gift = test_product.gifts.all().first()

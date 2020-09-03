@@ -37,11 +37,11 @@ class ProductTestCase(TestCase):
         Product.objects.create(name="TestProduct", brand="TestBrand", price="100.00GBP", in_stock_quantity=1)
 
     def test_purchase(self):
-        testProduct = Product.objects.get(name="TestProduct")
-        self.assertEqual(testProduct.in_stock_quantity, 1)
-        testProduct.buy()
-        self.assertEqual(testProduct.in_stock_quantity, 0)
-        self.assertRaises(ValidationError, testProduct.buy)
+        test_product = Product.objects.get(name="TestProduct")
+        self.assertEqual(test_product.in_stock_quantity, 1)
+        test_product.buy()
+        self.assertEqual(test_product.in_stock_quantity, 0)
+        self.assertRaises(ValidationError, test_product.buy)
 
 
 class GiftTestCase(TestCase):
@@ -74,6 +74,7 @@ class GiftTestCase(TestCase):
         gift.increase_quantity()
         self.assertEqual(gift.quantity, 2)
         gift.decrease_quantity()
+        self.assertEqual(gift.quantity, 1)
 
 
 class GiftViewTest(TestCase):
@@ -99,11 +100,13 @@ class GiftViewTest(TestCase):
         self.assertEqual(gift.bought_quantity, 1)
 
     def test_gift_remove(self):
+        # remove gift when quantity == 1
         gift = Gift_item.objects.get(note="more_test")
         view = self.set_up_view()
         self.assertEqual(gift.quantity, 1)
         view.delete_gift(gift.id)
         self.assertRaises(Gift_item.DoesNotExist, Gift_item.objects.get, note="more_test")
+        # remove gift when quantity != 1
         gift = Gift_item.objects.get(note="oos_test")
         self.assertEqual(gift.quantity, 2)
         view.delete_gift(gift.id)
@@ -146,11 +149,14 @@ class ProductViewTest(TestCase):
         view = self.set_up_view()
         self.assertEqual(len(test_product.gifts.all()), 0)
         view.request.GET['product_id'] = str(test_product.id)
+        # Add product without authentication
         view.get_queryset()
         self.assertEqual(len(test_product.gifts.all()), 0)
+        # Add product with authentication
         view.request.user = authenticate(username="Couple", password="password")
         view.get_queryset()
         self.assertEqual(len(test_product.gifts.all()), 1)
+        # Add already added product
         gift = test_product.gifts.all().first()
         self.assertEqual(gift.quantity, 1)
         view.get_queryset()

@@ -28,3 +28,12 @@ Currently there is no multiple user support, the username and password are the f
 | Username     | Password   |
 | :----------- | :--------: |
 | testCouple   | password   |
+
+## Possible improvements
+* Multiple user support
+* Multiple gift list support
+* New user registration
+* Creating new gift lists
+* New user type for guests: Can only be registered with an invitation from a couple, and can only see the inviting couple's gift lists
+* Fix security issues
+* Use persistent database instead of local SQLite
